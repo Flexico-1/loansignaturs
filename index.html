@@ -1,223 +1,145 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="si">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>Mobile Friendly Form</title>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flexico ණය තහවුරු කිරීම</title>
 <style>
-    body{
-        font-family:Arial;
-        padding:15px;
-        background:#f0f3f7;
-    }
-    .box{
-        background:#fff;
-        padding:18px;
-        border-radius:10px;
-        max-width:480px;
-        margin:auto;
-        box-shadow:0 4px 12px rgba(0,0,0,0.08);
-    }
-    label{
-        display:block;
-        margin-top:10px;
-        font-size:14px;
-        color:#333;
-    }
-    input{
-        width:100%;
-        padding:12px;
-        font-size:16px;
-        border-radius:6px;
-        border:1px solid #ccc;
-        margin-top:5px;
-    }
-
-    /* Signature Box */
-    #sig-box{
-        margin-top:12px;
-        border:2px dashed #aaa;
-        border-radius:8px;
-        background:#fff;
-        padding:10px;
-        touch-action: none; /* prevents scrolling while drawing */
-    }
-
-    #sig{
-        width:100%;
-        height:200px;   /* Mobile-friendly height */
-        background:#fff;
-        border-radius:6px;
-        touch-action: none;
-    }
-
-    button{
-        width:100%;
-        padding:12px;
-        margin-top:12px;
-        font-size:17px;
-        border:none;
-        border-radius:8px;
-        background:#007bff;
-        color:#fff;
-    }
-    button.secondary{
-        background:#555;
-    }
-
-    /* Result box */
-    #result{
-        display:none;
-        margin-top:20px;
-        background:#fff;
-        padding:18px;
-        border-radius:10px;
-        border:1px solid #ccc;
-        max-width:480px;
-        margin:auto;
-    }
-
-    .declaration{
-        margin-top:15px;
-        background:#f7f9fc;
-        padding:12px;
-        border-radius:8px;
-        font-size:14px;
-        line-height:1.6;
-        border:1px solid #dce3ee;
-    }
+  :root{
+    --accent:#007bff; --bg:#f4f7fb; --card:#fff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:Arial, sans-serif;
+    margin:0; padding:15px;
+    background:var(--bg);
+  }
+  .card{
+    max-width:480px; margin:auto;
+    background:var(--card); padding:16px;
+    border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  }
+  h2{margin-top:0; color:var(--accent);}
+  label{display:block;margin-top:12px;font-weight:600;}
+  input[type=text]{width:100%;padding:10px;margin-top:4px;border-radius:6px;border:1px solid #ccc;font-size:15px;}
+  .declaration{
+    margin-top:12px;padding:10px;border-radius:6px;border:1px solid #d0d7e0;background:#fdfdfd;
+    font-size:14px; line-height:1.5;
+  }
+  #sig-box{margin-top:12px;border:2px dashed #aaa;border-radius:6px;padding:8px;background:#fff;}
+  canvas#sig{width:100%;height:200px;border-radius:4px;background:#fff; touch-action:none; display:block;}
+  .buttons{margin-top:12px; display:flex; gap:8px;}
+  button{flex:1;padding:10px;border:none;border-radius:6px;background:var(--accent);color:#fff;font-weight:600;font-size:15px;cursor:pointer;}
+  button.secondary{background:#555;}
+  button[disabled]{opacity:0.55;cursor:not-allowed;}
+  #statusMsg{margin-top:10px;font-size:14px;color:#b12704;}
+  #result{display:none;margin-top:16px;padding:12px;border-radius:6px;border:1px solid #ccc;background:#fff;}
+  #result img{max-width:200px;border:1px solid #aaa;border-radius:4px;margin-top:6px;}
+  @media(max-width:360px){canvas#sig{height:180px;}}
 </style>
 </head>
-
 <body>
+<div class="card">
+<h2>Flexico – ණය තහවුරු කිරීම</h2>
 
-<div class="box">
-    <h3>Flexico – ණය තහවුරු කිරීම</h3>
+<label>නම</label>
+<input id="name" type="text" placeholder="නම">
 
-    <label>නම</label>
-    <input id="name" type="text">
+<label>මුදල</label>
+<input id="amount" type="text" placeholder="මුදල">
 
-    <label>මුදල</label>
-    <input id="amount" type="text">
+<label>NIC</label>
+<input id="nic" type="text" placeholder="NIC">
 
-    <label>NIC</label>
-    <input id="nic" type="text">
-
-    <!-- DECLARATION SECTION ADDED -->
-    <div class="declaration">
-        මෙම ණය මුදල මා විසින් ලබා ගන්නා අතර කිසිදු වංචාවක් හෝ පෙරහැරීමක් නොකරන මා විසින් පොරොන්දු වෙමි.<br><br>
-        එහෙම පැහැරහැරීමක් කිරීමක් හෝ කිසියම් වංචාවක් කලහොත් මා විසින් වගකීම ලබා ගන්නා බව පොරොන්දු වේ.
-    </div>
-
-    <label>අත්සන්</label>
-    <div id="sig-box">
-        <canvas id="sig"></canvas>
-    </div>
-
-    <button onclick="submitForm()">Submit</button>
-    <button class="secondary" onclick="clearSig()">Clear Signature</button>
+<div class="declaration">
+මෙම ණය මුදල මා විසින් ලබා ගන්නා අතර කිසිදු වංචාවක් හෝ පෙරහැරීමක් නොකරන මා විසින් පොරොන්දු වෙමි.<br><br>
+එහෙම පැහැරහැරීමක් කිරීමක් හෝ කිසියම් වංචාවක් කලහොත් මා විසින් වගකීම ලබා ගන්නා බව පොරොන්දු වේ.
 </div>
 
+<label>අත්සන්</label>
+<div id="sig-box"><canvas id="sig"></canvas></div>
+
+<div class="buttons">
+  <button id="submitBtn">Submit</button>
+  <button class="secondary" id="clearBtn">Clear Signature</button>
+</div>
+
+<div id="statusMsg"></div>
 
 <div id="result">
-    <h4>ඉල්ලීම් විස්තර</h4>
-
-    <p><b>නම:</b> <span id="r_name"></span></p>
-    <p><b>මුදල:</b> <span id="r_amount"></span></p>
-    <p><b>NIC:</b> <span id="r_nic"></span></p>
-    <p><b>අත්සන:</b></p>
-    <img id="r_sig" style="width:200px;border:1px solid #666;">
+  <p><b>නම:</b> <span id="r_name"></span></p>
+  <p><b>මුදල:</b> <span id="r_amount"></span></p>
+  <p><b>NIC:</b> <span id="r_nic"></span></p>
+  <p><b>අත්සන:</b></p>
+  <img id="r_sig">
+</div>
 </div>
 
 <script>
-// AUTO RESIZE CANVAS FOR MOBILE
-const canvas = document.getElementById("sig");
-const ctx = canvas.getContext("2d");
-
+// --- Responsive Canvas ---
+const canvas=document.getElementById('sig');
+const ctx=canvas.getContext('2d');
 function resizeCanvas(){
-    const box = document.getElementById("sig-box");
-    canvas.width = box.clientWidth;
-    canvas.height = 200;
+  const w=canvas.parentElement.clientWidth;
+  const ratio=window.devicePixelRatio||1;
+  canvas.width=w*ratio; canvas.height=200*ratio;
+  ctx.scale(ratio,ratio);
+  ctx.lineCap='round'; ctx.lineJoin='round';
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,w,200);
 }
+window.addEventListener('resize',resizeCanvas);
 resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
 
-// MOBILE DRAWING SUPPORT
-let drawing = false;
+// --- Drawing ---
+let drawing=false;
+function getPos(e){ const r=canvas.getBoundingClientRect();
+return e.touches?{x:e.touches[0].clientX-r.left, y:e.touches[0].clientY-r.top}:{x:e.clientX-r.left,y:e.clientY-r.top}; }
+canvas.addEventListener('pointerdown',e=>{drawing=true; const p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y);});
+canvas.addEventListener('pointermove',e=>{if(!drawing)return; const p=getPos(e); ctx.lineWidth=2; ctx.strokeStyle='#000'; ctx.lineTo(p.x,p.y); ctx.stroke();});
+canvas.addEventListener('pointerup',()=>drawing=false);
+canvas.addEventListener('pointercancel',()=>drawing=false);
+canvas.addEventListener('pointerout',()=>drawing=false);
 
-function getPos(e){
-    const rect = canvas.getBoundingClientRect();
-    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
-    return {x, y};
-}
-
-canvas.addEventListener("touchstart", e => {
-    e.preventDefault();
-    drawing = true;
-    const p = getPos(e);
-    ctx.beginPath();
-    ctx.moveTo(p.x, p.y);
+// Clear signature
+document.getElementById('clearBtn').addEventListener('click',()=>{
+ctx.clearRect(0,0,canvas.width,canvas.height);
+ctx.fillStyle='#fff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+document.getElementById('statusMsg').textContent='';
 });
 
-canvas.addEventListener("touchmove", e => {
-    if(!drawing) return;
-    e.preventDefault();
-    const p = getPos(e);
-    ctx.lineWidth = 2;
-    ctx.lineCap = "round";
-    ctx.strokeStyle = "#000";
-    ctx.lineTo(p.x, p.y);
-    ctx.stroke();
+// --- 15 min Cooldown ---
+const COOLDOWN=15;
+function getLastSubmit(){return parseInt(localStorage.getItem('last_submit')||'0');}
+function setLastSubmit(ts){localStorage.setItem('last_submit',ts);}
+function minutesRemaining(){const diff=(Date.now()-getLastSubmit())/1000; return Math.max(0,Math.ceil(COOLDOWN*60-diff));}
+function inCooldown(){return minutesRemaining()>0;}
+function formatTime(sec){return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0');}
+let countdown=null;
+function updateCooldownUI(){if(inCooldown()){submitBtn.disabled=true; let rem=minutesRemaining();
+document.getElementById('statusMsg').innerHTML=ඔබ දැනටමත් Submit කරලා තියෙනවා. තවත් <b>${formatTime(rem)}</b> බැලීමට අවශ්‍යයි.; if(countdown) clearInterval(countdown);
+countdown=setInterval(()=>{let s=minutesRemaining(); if(s<=0){clearInterval(countdown); submitBtn.disabled=false; document.getElementById('statusMsg').textContent=''; return;} document.getElementById('statusMsg').innerHTML=ඔබ දැනටමත් Submit කරලා තියෙනවා. තවත් <b>${formatTime(s)}</b> බැලීමට අවශ්‍යයි.;},1000);} else{submitBtn.disabled=false; document.getElementById('statusMsg').textContent=''; if(countdown){clearInterval(countdown); countdown=null;}}}
+updateCooldownUI();
+
+// --- Submit ---
+const submitBtn=document.getElementById('submitBtn');
+submitBtn.addEventListener('click',()=>{
+if(inCooldown()){alert('තවම Submit කල හැකි නැත'); return;}
+const name=document.getElementById('name').value.trim();
+const amount=document.getElementById('amount').value.trim();
+const nic=document.getElementById('nic').value.trim();
+if(!name||!amount||!nic){alert('සියලු විස්තර ඇතුල් කරන්න'); return;}
+const r_name=document.getElementById('r_name');
+const r_amount=document.getElementById('r_amount');
+const r_nic=document.getElementById('r_nic');
+const r_sig=document.getElementById('r_sig');
+r_name.textContent=name; r_amount.textContent=amount; r_nic.textContent=nic;
+r_sig.src=canvas.toDataURL('image/png');
+document.getElementById('result').style.display='block';
+setLastSubmit(Date.now());
+updateCooldownUI();
+ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle='#fff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
 });
-
-canvas.addEventListener("touchend", ()=> drawing = false);
-
-// MOUSE SUPPORT
-canvas.addEventListener("mousedown", e => {
-    drawing = true;
-    const p = getPos(e);
-    ctx.beginPath();
-    ctx.moveTo(p.x, p.y);
-});
-canvas.addEventListener("mousemove", e => {
-    if(!drawing) return;
-    const p = getPos(e);
-    ctx.lineWidth = 2;
-    ctx.lineCap = "round";
-    ctx.strokeStyle = "#000";
-    ctx.lineTo(p.x, p.y);
-    ctx.stroke();
-});
-canvas.addEventListener("mouseup", ()=> drawing = false);
-
-function clearSig(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-}
-
-function submitForm(){
-    let name = document.getElementById("name").value;
-    let amount = document.getElementById("amount").value;
-    let nic = document.getElementById("nic").value;
-
-    if(!name || !amount || !nic){
-        alert("සියලු විස්තර ඇතුල් කරන්න");
-        return;
-    }
-
-    document.getElementById("r_name").innerText = name;
-    document.getElementById("r_amount").innerText = amount;
-    document.getElementById("r_nic").innerText = nic;
-
-    const sigImg = canvas.toDataURL("image/png");
-    document.getElementById("r_sig").src = sigImg;
-
-    document.getElementById("result").style.display = "block";
-
-    window.scrollTo({top: document.body.scrollHeight, behavior:"smooth"});
-}
 </script>
-
 </body>
 </html>
