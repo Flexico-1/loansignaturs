@@ -1,157 +1,205 @@
 <!doctype html>
 <html lang="si">
 <head>
-<meta charset="utf-8" />
-<title>Loan Declaration - Flexico</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Mobile Friendly Form</title>
 
 <style>
     body{
         font-family:Arial;
-        padding:20px;
+        padding:15px;
         background:#f0f3f7;
     }
     .box{
         background:#fff;
-        padding:20px;
+        padding:18px;
         border-radius:10px;
-        max-width:700px;
+        max-width:480px;
         margin:auto;
-        box-shadow:0 4px 12px rgba(0,0,0,0.1);
+        box-shadow:0 4px 12px rgba(0,0,0,0.08);
     }
-    label{margin-top:10px;display:block;font-size:14px;color:#444;}
+    label{
+        display:block;
+        margin-top:10px;
+        font-size:14px;
+        color:#333;
+    }
     input{
         width:100%;
-        padding:10px;
-        margin-top:4px;
+        padding:12px;
+        font-size:16px;
         border-radius:6px;
         border:1px solid #ccc;
-        font-size:15px;
+        margin-top:5px;
     }
+
+    /* Signature Box */
+    #sig-box{
+        margin-top:12px;
+        border:2px dashed #aaa;
+        border-radius:8px;
+        background:#fff;
+        padding:10px;
+        touch-action: none; /* prevents scrolling while drawing */
+    }
+
     #sig{
         width:100%;
-        height:180px;
-        border:1px solid #aaa;
+        height:200px;   /* Mobile-friendly height */
         background:#fff;
-        margin-top:10px;
-    }
-    button{
-        padding:10px 16px;
-        margin-top:12px;
-        border:none;
         border-radius:6px;
+        touch-action: none; /* VERY IMPORTANT for mobile signature */
+    }
+
+    button{
+        width:100%;
+        padding:12px;
+        margin-top:12px;
+        font-size:17px;
+        border:none;
+        border-radius:8px;
         background:#007bff;
         color:#fff;
-        cursor:pointer;
-        font-size:15px;
     }
     button.secondary{
         background:#555;
-        margin-left:10px;
     }
+
+    /* Result box */
     #result{
-        margin-top:25px;
-        padding:20px;
-        background:#ffffff;
-        border-radius:10px;
         display:none;
-        border:1px solid #d3d8e0;
-    }
-    .title{
-        font-weight:bold;
-        color:#007bff;
-        margin-bottom:10px;
-        font-size:18px;
+        margin-top:20px;
+        background:#fff;
+        padding:18px;
+        border-radius:10px;
+        border:1px solid #ccc;
+        max-width:480px;
+        margin:auto;
     }
 </style>
-
 </head>
+
 <body>
 
 <div class="box">
-    <h2>Flexico ණය තහවුරු කිරීම</h2>
+    <h3>Flexico – ණය තහවුරු කිරීම</h3>
 
-    <label>ලබාගන්නා පුද්ගලයාගේ නම</label>
-    <input id="name" type="text" required>
+    <label>නම</label>
+    <input id="name" type="text">
 
-    <label>ලබාගන්නා ණය මුදල</label>
-    <input id="amount" type="text" required>
+    <label>මුදල</label>
+    <input id="amount" type="text">
 
-    <label>ජාතික හැඳුනුම්පත් අංකය</label>
-    <input id="nic" type="text" required>
+    <label>NIC</label>
+    <input id="nic" type="text">
 
-    <label>මෙතන අත්සන් කරන්න</label>
-    <canvas id="sig"></canvas>
+    <label>අත්සන්</label>
+    <div id="sig-box">
+        <canvas id="sig"></canvas>
+    </div>
 
     <button onclick="submitForm()">Submit</button>
     <button class="secondary" onclick="clearSig()">Clear Signature</button>
 </div>
 
 
-<!-- RESULTS AREA -->
 <div id="result">
-    <div class="title">ඉල්ලීම් විස්තර</div>
+    <h4>ඉල්ලීම් විස්තර</h4>
 
     <p><b>නම:</b> <span id="r_name"></span></p>
     <p><b>මුදල:</b> <span id="r_amount"></span></p>
     <p><b>NIC:</b> <span id="r_nic"></span></p>
     <p><b>අත්සන:</b></p>
-    <img id="r_sig" style="width:250px;border:1px solid #aaa;">
+    <img id="r_sig" style="width:200px;border:1px solid #666;">
 </div>
 
-
 <script>
-// ---------------- Signature Pad ----------------
+// AUTO RESIZE CANVAS FOR MOBILE
 const canvas = document.getElementById("sig");
 const ctx = canvas.getContext("2d");
+
+function resizeCanvas(){
+    const box = document.getElementById("sig-box");
+    canvas.width = box.clientWidth;   // full mobile width
+    canvas.height = 200;              // good mobile height
+}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
+
+// MOBILE DRAWING SUPPORT
 let drawing = false;
 
-canvas.addEventListener("mousedown", start);
-canvas.addEventListener("mousemove", draw);
-canvas.addEventListener("mouseup", () => drawing = false);
-canvas.addEventListener("mouseleave", () => drawing = false);
-
-function start(e){
-    drawing = true;
-    ctx.beginPath();
-    ctx.moveTo(e.offsetX, e.offsetY);
+function getPos(e){
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+    return {x, y};
 }
-function draw(e){
+
+canvas.addEventListener("touchstart", e => {
+    e.preventDefault();
+    drawing = true;
+    const p = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y);
+});
+
+canvas.addEventListener("touchmove", e => {
     if(!drawing) return;
+    e.preventDefault();
+    const p = getPos(e);
     ctx.lineWidth = 2;
     ctx.lineCap = "round";
     ctx.strokeStyle = "#000";
-    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.lineTo(p.x, p.y);
     ctx.stroke();
-}
+});
+
+canvas.addEventListener("touchend", ()=> drawing = false);
+
+// MOUSE SUPPORT
+canvas.addEventListener("mousedown", e => {
+    drawing = true;
+    const p = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y);
+});
+canvas.addEventListener("mousemove", e => {
+    if(!drawing) return;
+    const p = getPos(e);
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "#000";
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+});
+canvas.addEventListener("mouseup", ()=> drawing = false);
 
 function clearSig(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
 }
 
-// ---------------- Submit & Show Data ------------
 function submitForm(){
-    const name   = document.getElementById("name").value;
-    const amount = document.getElementById("amount").value;
-    const nic    = document.getElementById("nic").value;
+    let name = document.getElementById("name").value;
+    let amount = document.getElementById("amount").value;
+    let nic = document.getElementById("nic").value;
 
     if(!name || !amount || !nic){
-        alert("කරුණාකර සියලු විස්තර ඇතුල් කරන්න.");
+        alert("සියලු විස්තර ඇතුල් කරන්න");
         return;
     }
 
-    // Get signature image
-    const signature = canvas.toDataURL("image/png");
-
-    // Show data in result box
     document.getElementById("r_name").innerText = name;
     document.getElementById("r_amount").innerText = amount;
     document.getElementById("r_nic").innerText = nic;
-    document.getElementById("r_sig").src = signature;
+
+    const sigImg = canvas.toDataURL("image/png");
+    document.getElementById("r_sig").src = sigImg;
 
     document.getElementById("result").style.display = "block";
 
-    // Scroll to result
-    window.scrollTo({top:document.body.scrollHeight, behavior:'smooth'});
+    window.scrollTo({top: document.body.scrollHeight, behavior:"smooth"});
 }
 </script>
 
