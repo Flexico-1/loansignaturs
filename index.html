@@ -49,7 +49,7 @@
         height:200px;   /* Mobile-friendly height */
         background:#fff;
         border-radius:6px;
-        touch-action: none; /* VERY IMPORTANT for mobile signature */
+        touch-action: none;
     }
 
     button{
@@ -77,6 +77,16 @@
         max-width:480px;
         margin:auto;
     }
+
+    .declaration{
+        margin-top:15px;
+        background:#f7f9fc;
+        padding:12px;
+        border-radius:8px;
+        font-size:14px;
+        line-height:1.6;
+        border:1px solid #dce3ee;
+    }
 </style>
 </head>
 
@@ -93,6 +103,12 @@
 
     <label>NIC</label>
     <input id="nic" type="text">
+
+    <!-- DECLARATION SECTION ADDED -->
+    <div class="declaration">
+        මෙම ණය මුදල මා විසින් ලබා ගන්නා අතර කිසිදු වංචාවක් හෝ පෙරහැරීමක් නොකරන මා විසින් පොරොන්දු වෙමි.<br><br>
+        එහෙම පැහැරහැරීමක් කිරීමක් හෝ කිසියම් වංචාවක් කලහොත් මා විසින් වගකීම ලබා ගන්නා බව පොරොන්දු වේ.
+    </div>
 
     <label>අත්සන්</label>
     <div id="sig-box">
@@ -121,8 +137,8 @@ const ctx = canvas.getContext("2d");
 
 function resizeCanvas(){
     const box = document.getElementById("sig-box");
-    canvas.width = box.clientWidth;   // full mobile width
-    canvas.height = 200;              // good mobile height
+    canvas.width = box.clientWidth;
+    canvas.height = 200;
 }
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
