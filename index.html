@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Flexico Loan signature</title>
+<title>Flexico Loan Form</title>
 <style>
 body {
     font-family: Arial, sans-serif;
@@ -72,7 +72,6 @@ button {
 button.secondary {
     background: #555;
 }
-
 /* Loading spinner */
 #loadingMsg {
     display: none;
@@ -92,7 +91,6 @@ button.secondary {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
-
 #result {
     display: none;
     margin-top: 20px;
@@ -140,7 +138,7 @@ button.secondary {
 
 <div id="loadingMsg">
     <div class="spinner"></div>
-    <p>ඔබගේ විස්තර සියල්ල යවමින් පවතී…</p>
+    <p>ඔබගේ විස්තර පරික්ෂා කෙරෙමින් පවතී…</p>
 </div>
 
 <div id="result">
@@ -154,9 +152,10 @@ button.secondary {
 </div>
 
 <script>
-// Canvas Setup
+// Canvas Setup with smoothing
 const canvas = document.getElementById("sig");
 const ctx = canvas.getContext("2d");
+let points = [];
 
 function resizeCanvas(){
     const box = document.getElementById("sig-box");
@@ -166,8 +165,6 @@ function resizeCanvas(){
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-// Drawing Support
-let drawing = false;
 function getPos(e){
     const rect = canvas.getBoundingClientRect();
     const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
@@ -175,12 +172,53 @@ function getPos(e){
     return {x,y};
 }
 
-canvas.addEventListener("touchstart", e => { e.preventDefault(); drawing=true; const p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); });
-canvas.addEventListener("touchmove", e => { if(!drawing) return; e.preventDefault(); const p=getPos(e); ctx.lineWidth=2; ctx.lineCap="round"; ctx.strokeStyle="#000"; ctx.lineTo(p.x,p.y); ctx.stroke(); });
+let drawing=false;
+
+function drawLine(){
+    if(points.length<3) return;
+    const p1 = points[points.length-3];
+    const p2 = points[points.length-2];
+    const p3 = points[points.length-1];
+    ctx.beginPath();
+    ctx.moveTo(p1.x,p1.y);
+    ctx.quadraticCurveTo(p2.x,p2.y,p3.x,p3.y);
+    ctx.stroke();
+}
+
+canvas.addEventListener("touchstart", e => {
+    e.preventDefault();
+    drawing=true;
+    points=[];
+    const p = getPos(e);
+    points.push(p);
+});
+canvas.addEventListener("touchmove", e => {
+    if(!drawing) return;
+    e.preventDefault();
+    const p = getPos(e);
+    points.push(p);
+    ctx.lineWidth=2;
+    ctx.lineCap="round";
+    ctx.strokeStyle="#000";
+    drawLine();
+});
 canvas.addEventListener("touchend", ()=>drawing=false);
 
-canvas.addEventListener("mousedown", e=>{drawing=true; const p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y);});
-canvas.addEventListener("mousemove", e=>{if(!drawing) return; const p=getPos(e); ctx.lineWidth=2; ctx.lineCap="round"; ctx.strokeStyle="#000"; ctx.lineTo(p.x,p.y); ctx.stroke();});
+canvas.addEventListener("mousedown", e => {
+    drawing=true;
+    points=[];
+    const p=getPos(e);
+    points.push(p);
+});
+canvas.addEventListener("mousemove", e => {
+    if(!drawing) return;
+    const p=getPos(e);
+    points.push(p);
+    ctx.lineWidth=2;
+    ctx.lineCap="round";
+    ctx.strokeStyle="#000";
+    drawLine();
+});
 canvas.addEventListener("mouseup", ()=>drawing=false);
 
 function clearSig(){ ctx.clearRect(0,0,canvas.width,canvas.height); }
@@ -207,7 +245,7 @@ function submitForm(){
         document.getElementById("result").style.display = "block";
         document.getElementById("successMsg").innerText = "විස්තර යවා ඇත";
         window.scrollTo({top: document.body.scrollHeight, behavior:"smooth"});
-    }, 5000); // 5 seconds delay
+    }, 5000);
 }
 </script>
 
